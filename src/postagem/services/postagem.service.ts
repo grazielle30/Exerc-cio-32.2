@@ -15,7 +15,8 @@ export class PostagemService {
     async findAll(): Promise<Postagem[]> {
         return await this.postagemRepository.find({
             relations: {
-                tema: true
+                tema: true,
+                usuario: true
             }
         });
     }
@@ -27,7 +28,8 @@ export class PostagemService {
                 id
             },
             relations: {
-                tema: true
+                tema: true,
+                usuario: true
             }
         });
 
@@ -44,35 +46,60 @@ export class PostagemService {
                 titulo: ILike(`%${titulo}%`)
             },
             relations: {
-                tema: true
+                tema: true,
+                usuario: true
             }
         });
     }
 
     async create(postagem: Postagem): Promise<Postagem> {
 
-        await this.temaService.findById(postagem.tema.id);
+        if (postagem.tema){
+
+        let tema = await this.temaService.findById(postagem.tema.id);
+
+        if (!tema)
+            throw new HttpException('Tema não encontrado', HttpStatus.NOT_FOUND);
 
         return await this.postagemRepository.save(postagem);
     }
+
+    return await this.postagemRepository.save(postagem);
+
+}
 
 
     async update(postagem: Postagem): Promise<Postagem> {
 
-        await this.findById(postagem.id);
+        let buscaPostagem: Postagem = await this.findById(postagem.id);
 
-        await this.temaService.findById(postagem.tema.id);
+        if (!buscaPostagem)
+            throw new HttpException('Postagem não encontrada', HttpStatus.NOT_FOUND);
+
+        if (postagem.tema) {
+
+        let tema = await this.temaService.findById(postagem.tema.id);
+
+        if (!tema)
+            throw new HttpException('Tema não encontrado', HttpStatus.NOT_FOUND);
 
         return await this.postagemRepository.save(postagem);
 
     }
 
+    return await this.postagemRepository.save(postagem);
+}
+    
+
     async delete(id: number): Promise<DeleteResult> {
 
-        await this.findById(id);
+        let buscaPostagem = await this.findById(id);
+
+        if (!buscaPostagem)
+            throw new HttpException('Postagem não encontrada', HttpStatus.NOT_FOUND);
 
         return await this.postagemRepository.delete(id);
     }
 
 
-}   
+}
